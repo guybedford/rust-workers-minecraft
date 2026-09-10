@@ -1,0 +1,25 @@
+AGENTS.md
+  s_39500782c19264::t_ad02ba779fde16 22
+Cargo.lock
+  s_39500782c19264::t_fa85660385d910 2424-2425,2942
+Cargo.toml
+  s_39500782c19264::t_81eb86a9394d98 43
+docs/dependencies.md
+  s_39500782c19264::t_c64ca6762faa47 31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "82c81ad15348246999a133a3ecf67a956273f8e0",
+  "prompts": {},
+  "sessions": {
+    "s_39500782c19264": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f77d27979ffeEbf2Lz5s9BkM6J",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Guy Bedford <gbedford@cloudflare.com>"
+    }
+  }
+}
