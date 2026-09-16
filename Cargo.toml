@@ -17,9 +17,11 @@ name = "pumpkin-do"
 path = "src/main.rs"
 
 [dependencies]
+worker = { path = ".work/workers-rs/worker" }
 wasm-bindgen = "0.2.128"
+wasm-bindgen-futures = { version = "0.4.78", features = ["tokio"] }
 js-sys = "0.3.105"
-web-sys = { version = "0.3.105", features = ["AbortController", "AbortSignal", "Headers", "ReadableStream", "Request", "Response", "ResponseInit", "StreamPipeOptions", "Url", "WritableStream", "console"] }
+web-sys = { version = "0.3.105", features = ["AbortController", "AbortSignal", "ReadableStream", "StreamPipeOptions", "WritableStream", "console"] }
 tokio = { version = "1", default-features = false, features = ["rt", "macros", "sync", "time", "net", "io-util"] }
 pumpkin = { path = ".work/pumpkin/crates/pumpkin", default-features = false, features = ["single-threaded"] }
 pumpkin-config = { path = ".work/pumpkin/crates/pumpkin-config", default-features = false }
@@ -27,18 +29,31 @@ rayon = "1.12"
 
 # wasm32-unknown-emscripten support pending upstream releases.
 [patch.crates-io]
-# EventLoopRuntime: the host event loop drives Tokio (tokio-rs/tokio#8479).
+# LocalEventLoop: the host event loop drives Tokio (tokio-rs/tokio#8484).
 tokio = { path = ".work/tokio/tokio" }
 tokio-macros = { path = ".work/tokio/tokio-macros" }
 # tokio-rs/mio#1969; its emscripten epoll bindings come from libc's unreleased libc-0.2 branch.
-mio = { git = "https://github.com/guybedford/mio", rev = "a62c9e46833fc255c9217ab9aa362c6221ed4401" }
+mio = { git = "https://github.com/guybedford/mio", branch = "emscripten" }
 libc = { git = "https://github.com/rust-lang/libc", branch = "libc-0.2" }
 # getrandom-backed SystemRandom on emscripten.
 ring = { git = "https://github.com/guybedford/ring", branch = "emscripten" }
+# rlib-only: cargo would otherwise also link its cdylib, which emcc cannot produce.
+wasm-streams = { git = "https://github.com/guybedford/wasm-streams", branch = "rlib-only" }
+# `#[wasm_bindgen(tokio)]` exports on the event loop (wasm-bindgen/wasm-bindgen#5334),
+# from the workers-rs checkout so the worker crate shares one wasm-bindgen.
+wasm-bindgen = { path = ".work/workers-rs/wasm-bindgen" }
+wasm-bindgen-macro-support = { path = ".work/workers-rs/wasm-bindgen/crates/macro-support" }
+wasm-bindgen-shared = { path = ".work/workers-rs/wasm-bindgen/crates/shared" }
+wasm-bindgen-futures = { path = ".work/workers-rs/wasm-bindgen/crates/futures" }
+js-sys = { path = ".work/workers-rs/wasm-bindgen/crates/js-sys" }
+web-sys = { path = ".work/workers-rs/wasm-bindgen/crates/web-sys" }
 
 # mio's own libc source, unified with the crates.io users above.
 [patch."https://github.com/guybedford/libc"]
 libc = { git = "https://github.com/rust-lang/libc", branch = "libc-0.2" }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(worker_tokio, values("event_loop", "jspi"))'] }
 
 [profile.release]
 opt-level = "s"

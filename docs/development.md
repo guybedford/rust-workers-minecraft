@@ -1,13 +1,14 @@
 # Development
 
 Follow the [README setup instructions](../README.md#try-it) to install the pinned
-Rust toolchain, provision dependency sources and Emscripten, and install the
-wasm-bindgen CLI.
+Rust toolchain, provision dependency sources and Emscripten, and build the
+worker-build and wasm-bindgen CLIs.
 The initial Pumpkin compilation takes several minutes. Later builds use Cargo's
-cache. `.cargo/config.toml` owns the link settings; `build.rs` adds the JS library
-(`src/workerd.js`) and tracks changes to it. The build output Wrangler serves is
-`target/workers/wasm32-unknown-emscripten/release/pumpkin-do.js`, re-exported by
-`worker/index.mjs`.
+cache. worker-build owns the common codegen and link settings; `build.rs` adds
+the application's own and the JS library (`src/workerd.js`), tracking changes to
+it. `.cargo/config.toml` repeats the codegen cfgs so `cargo check` sees them.
+Wrangler runs `worker-build --emscripten --tokio --release` as its build command
+and serves `build/index.js`.
 
 ```sh
 npm run build          # Compile the production Worker
